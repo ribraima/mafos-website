@@ -30,7 +30,7 @@
   <circle cx="628" cy="335" r="22" fill="#A8B89A"/>
   <circle cx="400" cy="440" r="20" fill="#C65D2E"/>
   <rect x="60" y="560" width="680" height="24" rx="6" fill="#EBD3A6"/>
-  <rect x="80" y="584" width="640" height="200" rx="8" fill="#7A3D00"/>
+  <rect x="80" y="584" width="640" height="200" rx="8" fill="#7A3E00"/>
   <g fill="#FFD54F">
     <rect x="180" y="700" width="80" height="16" rx="8"/>
     <rect x="216" y="716" width="8" height="140"/>

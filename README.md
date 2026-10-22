@@ -2,6 +2,8 @@
 
 Double-click `index.html` to open the site. Nothing to install, no build step, no server.
 
+Brand rules (logo, colours, fonts, components) live in the Mafos Design brandbook: https://claude.ai/artifact/Qk8rk1i7ShiaxU5a6TRHEf. The colour and spacing tokens at the top of `assets/css/style.css` use the same names and values.
+
 ## How it is built, and why
 
 - **Plain HTML, CSS and one JavaScript file.** Free to host anywhere, nothing to update, nothing to break.

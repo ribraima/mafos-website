@@ -5,7 +5,7 @@
 
 :root {
   --brand-yellow: #ffd54f;
-  --brand-brown: #7a3d00;
+  --brand-brown: #7a3e00;
   --brand-cream: #fff6dc;
 
   --bg: #fffcf4;
@@ -14,6 +14,7 @@
   --ink: #26150a;
   --muted: #6f5a48;
   --line: #ecdfc6;
+  --line-strong: #9a8570;
   --accent: var(--brand-brown);
   --on-accent: var(--brand-cream);
   --focus: #1d4ed8;
@@ -35,6 +36,7 @@
     --ink: #f6ead6;
     --muted: #c2ab92;
     --line: #3a2919;
+    --line-strong: #7d6750;
     --accent: var(--brand-yellow);
     --on-accent: #2a1608;
     --focus: #93c5fd;
@@ -243,7 +245,7 @@ figure {
 .lang-switch {
   display: inline-flex;
   padding: 3px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-strong);
   border-radius: 999px;
 }
 
@@ -276,7 +278,7 @@ figure {
     width: 42px;
     height: 42px;
     padding: 0 11px;
-    border: 1px solid var(--line);
+    border: 1px solid var(--line-strong);
     border-radius: 12px;
     background: transparent;
     cursor: pointer;
@@ -424,7 +426,7 @@ figure {
   gap: 8px;
   min-height: 40px;
   padding: 0 16px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-strong);
   border-radius: 999px;
   background: var(--surface);
   color: var(--ink);
@@ -502,8 +504,8 @@ figure {
   left: 12px;
   padding: 5px 9px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.9);
-  color: #26150a;
+  background: var(--brand-cream);
+  color: var(--brand-brown);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.08em;
