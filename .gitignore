@@ -1,0 +1,7 @@
+# Brand source files stay on this computer (the repository is public)
+*.pdf
+
+# Operating system clutter
+Thumbs.db
+desktop.ini
+.DS_Store
