@@ -34,9 +34,9 @@ window.SITE_CONTENT = {
     "defaultLang": "en",
     "languages": ["en", "sq"],
     "contact": {
-      "whatsapp": "355690000000",
+      "whatsapp": "355692449276",
       "email": "hello@mafos.al",
-      "phone": "+355 69 000 0000",
+      "phone": "+355 69 244 9276",
       "instagram": "mafos.design"
     }
   },
