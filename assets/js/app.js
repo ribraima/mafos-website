@@ -8,6 +8,7 @@
 
   const LANG_KEY = "mafos:lang";
   const state = { content: null, lang: "sq", category: "all" };
+  const lightbox = { pictures: [], index: 0, title: "" };
 
   /* ---------- Content source ----------
    * The only place that knows where content comes from. To move content into a
@@ -76,6 +77,29 @@
   const categoryBySlug = (slug) => state.content.categories.find((c) => c.slug === slug);
   const projectUrl = (project) => `project.html?p=${encodeURIComponent(project.slug)}`;
   const galleryOf = (project) => (project.images && project.images.length ? project.images : [project.cover]);
+  const isEmbed = (item) => Boolean(item && item.embed);
+
+  // How wide each image is shown, so the browser can pick the right web copy.
+  const CARD_SIZES = "(max-width: 560px) 50vw, (max-width: 1240px) 33vw, 400px";
+  const GALLERY_SIZES = "(max-width: 1240px) 100vw, 1120px";
+
+  // An image is a plain path (placeholders, hand-added files) or the object that
+  // scripts/add-project.ps1 writes: { src, srcset, width, height }.
+  function imageAttrs(image, sizes) {
+    if (!image || typeof image === "string") return `src="${escapeHtml(image || "")}" width="800" height="1000"`;
+    const srcset = image.srcset ? ` srcset="${escapeHtml(image.srcset)}" sizes="${sizes}"` : "";
+    return `src="${escapeHtml(image.src)}"${srcset} width="${Number(image.width) || 800}" height="${Number(image.height) || 1000}"`;
+  }
+
+  // YouTube and Vimeo links become privacy-friendly player URLs; anything else is ignored.
+  function embedUrl(link) {
+    const youtube = /(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([\w-]{11})/.exec(link);
+    if (youtube) return `https://www.youtube-nocookie.com/embed/${youtube[1]}`;
+    const vimeo = /vimeo\.com\/(?:video\/)?(\d+)/.exec(link);
+    if (vimeo) return `https://player.vimeo.com/video/${vimeo[1]}?dnt=1`;
+    console.warn(`[content] Unsupported video link: ${link}`);
+    return null;
+  }
 
   function whatsappUrl(message) {
     return `https://wa.me/${state.content.site.contact.whatsapp}?text=${encodeURIComponent(message)}`;
@@ -164,7 +188,7 @@
     return `
       <a class="card" href="${projectUrl(project)}">
         <div class="card-media">
-          <img src="${escapeHtml(project.cover)}" alt="${escapeHtml(title)}" width="800" height="1000" loading="lazy" decoding="async">
+          <img ${imageAttrs(project.cover, CARD_SIZES)} alt="${escapeHtml(title)}" loading="lazy" decoding="async">
           ${project.sample ? `<span class="badge">${escapeHtml(ui("work.sample"))}</span>` : ""}
         </div>
         <div class="card-body">
@@ -238,9 +262,28 @@
 
     const title = tr(project.title);
     const category = categoryBySlug(project.category);
-    const images = galleryOf(project);
+    const media = galleryOf(project);
+    const pictures = media.filter((item) => !isEmbed(item));
     const next = nextProject(project);
     document.title = `${title} — ${brandTitle()}`;
+    lightbox.pictures = pictures;
+    lightbox.title = title;
+
+    let pictureIndex = -1;
+    const mediaHtml = (item, i) => {
+      if (isEmbed(item)) {
+        const src = embedUrl(item.embed);
+        return src
+          ? `<figure class="embed"><iframe src="${escapeHtml(src)}" title="${escapeHtml(title)}" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></figure>`
+          : "";
+      }
+      pictureIndex += 1;
+      // The ratio lets tall images shrink to fit the screen height instead of filling the width.
+      const ratio = item && item.width && item.height ? item.width / item.height : 0.8;
+      return `<figure><button type="button" class="zoom" data-zoom="${pictureIndex}" style="--ratio: ${ratio.toFixed(4)}" aria-label="${escapeHtml(ui("project.zoom"))}">
+          <img ${imageAttrs(item, GALLERY_SIZES)} alt="${escapeHtml(`${title} — ${pictureIndex + 1}`)}"${i > 0 ? ' loading="lazy"' : ""} decoding="async">
+        </button></figure>`;
+    };
 
     root.innerHTML = `
       <a class="back-link" href="index.html?c=${encodeURIComponent(project.category)}#work">← ${escapeHtml(ui("project.back"))}</a>
@@ -254,12 +297,8 @@
         </dl>
         ${project.sample ? `<p class="sample-note">${escapeHtml(ui("project.sampleNote"))}</p>` : ""}
       </header>
-      <div class="project-gallery${images.length === 1 ? " is-single" : ""}">
-        ${images
-          .map(
-            (src, i) => `<figure><img src="${escapeHtml(src)}" alt="${escapeHtml(`${title} — ${i + 1}`)}" width="800" height="1000"${i > 0 ? ' loading="lazy"' : ""} decoding="async"></figure>`
-          )
-          .join("")}
+      <div class="project-gallery">
+        ${media.map(mediaHtml).join("")}
       </div>
       <section class="project-cta">
         <h2>${escapeHtml(ui("project.ctaTitle"))}</h2>
@@ -270,6 +309,32 @@
           ? `<a class="next-project" href="${projectUrl(next)}"><span>${escapeHtml(ui("project.next"))}</span><strong>${escapeHtml(tr(next.title))} →</strong></a>`
           : ""
       }`;
+  }
+
+  /* ---------- Full-screen image viewer (project page) ---------- */
+  function showPicture(index) {
+    const dialog = $("[data-lightbox]");
+    const count = lightbox.pictures.length;
+    lightbox.index = (index + count) % count;
+    const picture = lightbox.pictures[lightbox.index];
+    const img = $(".lightbox-image", dialog);
+    img.removeAttribute("srcset");
+    if (picture && typeof picture === "object" && picture.srcset) {
+      img.sizes = "100vw";
+      img.srcset = picture.srcset;
+    }
+    img.src = typeof picture === "string" ? picture : picture.src;
+    img.alt = `${lightbox.title} — ${lightbox.index + 1}`;
+    $(".lightbox-count", dialog).textContent = `${lightbox.index + 1} / ${count}`;
+    dialog.classList.toggle("is-single", count < 2);
+  }
+
+  function openLightbox(index) {
+    const dialog = $("[data-lightbox]");
+    if (!dialog || !lightbox.pictures.length) return;
+    showPicture(index);
+    document.documentElement.classList.add("lightbox-open");
+    dialog.showModal();
   }
 
   /* ---------- Wiring ---------- */
@@ -305,6 +370,20 @@
         return;
       }
 
+      const zoom = event.target.closest("[data-zoom]");
+      if (zoom) {
+        openLightbox(Number(zoom.dataset.zoom));
+        return;
+      }
+
+      const dialog = event.target.closest("[data-lightbox]");
+      if (dialog) {
+        if (event.target.closest("[data-lightbox-prev]")) showPicture(lightbox.index - 1);
+        else if (event.target.closest("[data-lightbox-next]")) showPicture(lightbox.index + 1);
+        else if (event.target.closest("[data-lightbox-close]") || event.target === dialog) dialog.close();
+        return;
+      }
+
       const menuToggle = event.target.closest(".menu-toggle");
       if (menuToggle) {
         const open = document.body.classList.toggle("menu-open");
@@ -317,7 +396,13 @@
 
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") closeMenu();
+      if ($("[data-lightbox]")?.open) {
+        if (event.key === "ArrowLeft") showPicture(lightbox.index - 1);
+        if (event.key === "ArrowRight") showPicture(lightbox.index + 1);
+      }
     });
+
+    $("[data-lightbox]")?.addEventListener("close", () => document.documentElement.classList.remove("lightbox-open"));
   }
 
   function init(content) {

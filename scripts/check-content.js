@@ -52,6 +52,19 @@ categories.forEach((category, i) => {
 // The live server is case-sensitive: "Cover.JPG" and "cover.jpg" are different files there.
 const fileExists = (relativePath) => fs.existsSync(path.join(root, relativePath));
 
+// Every file an image points at: a plain path, or the web copies in an image object's srcset.
+function imageFiles(image) {
+  if (!image || image.embed) return [];
+  if (typeof image === "string") return [image];
+  const files = new Set([image.src]);
+  String(image.srcset || "")
+    .split(",")
+    .forEach((part) => files.add(part.trim().split(/\s+/)[0]));
+  return [...files].filter(Boolean);
+}
+
+const VIDEO_LINK = /^https:\/\/((www|m)\.)?(youtube\.com|youtu\.be|vimeo\.com|player\.vimeo\.com)\//;
+
 const projectSlugs = new Set();
 projects.forEach((project, i) => {
   const name = project.slug ? `Project "${project.slug}"` : `projects[${i}]`;
@@ -65,9 +78,40 @@ projects.forEach((project, i) => {
   if (!project.title) errors.push(`${name} has no title.`);
   if (!project.cover) errors.push(`${name} has no cover image.`);
 
-  new Set([project.cover, ...(project.images || [])]).forEach((image) => {
-    if (image && !fileExists(image)) errors.push(`${name}: image not found: ${image} (check the spelling and capital letters).`);
+  const media = [project.cover, ...(project.images || [])];
+  media.forEach((item) => {
+    if (item && item.embed && !VIDEO_LINK.test(item.embed)) {
+      errors.push(`${name}: video link must be a YouTube or Vimeo address: ${item.embed}`);
+    }
   });
+  new Set(media.flatMap(imageFiles)).forEach((image) => {
+    if (!fileExists(image)) errors.push(`${name}: image not found: ${image} (check the spelling and capital letters).`);
+  });
+});
+
+// Cloudflare Pages refuses files over 25 MiB, and big files are slow on phones anyway.
+const MAX_BYTES = 25 * 1024 * 1024;
+const HEAVY_BYTES = 2 * 1024 * 1024;
+const warnings = [];
+const walk = (dir) =>
+  fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const full = path.join(dir, entry.name);
+    return entry.isDirectory() ? walk(full) : [full];
+  });
+const imagesDir = path.join(root, "images");
+if (fs.existsSync(imagesDir)) {
+  walk(imagesDir).forEach((file) => {
+    const size = fs.statSync(file).size;
+    const relative = path.relative(root, file).split(path.sep).join("/");
+    const mb = (size / 1024 / 1024).toFixed(1);
+    if (size > MAX_BYTES) errors.push(`${relative} is ${mb} MB; the host refuses files over 25 MB. Add the original with add-project.cmd, which makes small web copies.`);
+    else if (size > HEAVY_BYTES) warnings.push(`${relative} is ${mb} MB, which loads slowly on phones. add-project.cmd makes web copies of a few hundred KB.`);
+  });
+}
+
+warnings.forEach((warning) => {
+  console.warn(`Warning: ${warning}`);
+  if (inGitHubActions) console.log(`::warning title=Heavy image::${warning}`);
 });
 
 if (errors.length) {

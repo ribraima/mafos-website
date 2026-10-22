@@ -7,6 +7,13 @@ echo Getting the latest version from GitHub...
 git pull --rebase --autostash -q
 if errorlevel 1 goto failed
 
+rem Same check GitHub runs before publishing, so mistakes show up here first.
+where node >nul 2>nul
+if not errorlevel 1 (
+  node scripts\check-content.js
+  if errorlevel 1 goto failed
+)
+
 git add -A
 git diff --cached --quiet
 if not errorlevel 1 (

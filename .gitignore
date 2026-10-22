@@ -1,5 +1,11 @@
-# Brand source files stay on this computer (the repository is public)
+# Brand source files and big originals stay on this computer (the repository is public).
+# add-project.cmd publishes small web copies of them instead.
 *.pdf
+*.psd
+*.tif
+*.tiff
+*.heic
+originals/
 
 # Operating system clutter
 Thumbs.db

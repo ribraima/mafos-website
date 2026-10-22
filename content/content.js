@@ -6,12 +6,15 @@
  * You never need to touch the HTML, CSS or JavaScript to add work.
  *
  * ADD A PROJECT
- *   1. Put the images in  images/projects/<project-slug>/
- *      (JPG or WebP, about 1600 px on the long side, under ~400 KB each).
- *   2. Copy one block from "projects" below, paste it at the TOP of the list
- *      (newest first), and change the values.
- *   3. "category" must match a "slug" from "categories".
- *   4. Delete "sample": true — that flag marks placeholder work.
+ *   Drag the folder with the project's files (any size: JPG, PNG, TIFF, PSD,
+ *   HEIC, PDF) onto add-project.cmd. It makes the web copies and adds the
+ *   project at the top of the "projects" list below for you.
+ *
+ *   By hand instead: put small images in images/projects/<project-slug>/,
+ *   copy one block from "projects", paste it at the TOP of the list and change
+ *   the values. "category" must match a "slug" from "categories". Delete
+ *   "sample": true, which marks placeholder work. A video is an item
+ *   { "embed": "https://youtu.be/..." } in "images" (YouTube or Vimeo).
  *
  * ADD A CATEGORY
  *   Add a line to "categories". A category appears on the site as soon as
@@ -223,6 +226,11 @@ window.SITE_CONTENT = {
       "project.ctaButton": "Na shkruaj për këtë",
       "project.sampleNote": "Projekt shembull — së shpejti me punë reale.",
       "project.notFound": "Ky projekt nuk u gjet.",
+      "project.zoom": "Shiko në madhësi të plotë",
+      "lightbox.label": "Shikuesi i imazheve",
+      "lightbox.close": "Mbyll",
+      "lightbox.prev": "Imazhi i mëparshëm",
+      "lightbox.next": "Imazhi tjetër",
       "footer.rights": "Të gjitha të drejtat e rezervuara.",
       "whatsapp.general": "Përshëndetje {brand}! Kam një projekt dhe do të doja të flisnim.",
       "whatsapp.project": "Përshëndetje! Pashë projektin \"{title}\" në faqen tuaj dhe do të doja diçka të ngjashme.",
@@ -263,6 +271,11 @@ window.SITE_CONTENT = {
       "project.ctaButton": "Ask us about this",
       "project.sampleNote": "Sample project — real work coming soon.",
       "project.notFound": "This project could not be found.",
+      "project.zoom": "View full size",
+      "lightbox.label": "Image viewer",
+      "lightbox.close": "Close",
+      "lightbox.prev": "Previous image",
+      "lightbox.next": "Next image",
       "footer.rights": "All rights reserved.",
       "whatsapp.general": "Hi {brand}! I have a project and would love to talk.",
       "whatsapp.project": "Hi! I saw the \"{title}\" project on your website and I'd like something similar.",

@@ -40,6 +40,14 @@
     <div class="container" data-project></div>
   </main>
 
+  <dialog class="lightbox" data-lightbox aria-label="Image viewer" data-i18n-aria="lightbox.label">
+    <img class="lightbox-image" alt="">
+    <button type="button" class="lightbox-btn lightbox-close" data-lightbox-close aria-label="Close" data-i18n-aria="lightbox.close">×</button>
+    <button type="button" class="lightbox-btn lightbox-prev" data-lightbox-prev aria-label="Previous image" data-i18n-aria="lightbox.prev">←</button>
+    <button type="button" class="lightbox-btn lightbox-next" data-lightbox-next aria-label="Next image" data-i18n-aria="lightbox.next">→</button>
+    <p class="lightbox-count" aria-live="polite"></p>
+  </dialog>
+
   <footer class="site-footer">
     <div class="container footer-inner">
       <span>© <span data-year>2026</span> <span data-brand-name>Mafos</span> <span data-brand-sub>Design</span>. <span data-i18n="footer.rights">All rights reserved.</span></span>
