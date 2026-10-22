@@ -31,7 +31,7 @@ if errorlevel 1 goto failed
 
 echo.
 echo Sent. The live site updates in about a minute:
-echo   https://ribraima.github.io/mafos-website/
+echo   https://mafos.pages.dev
 echo Progress and any problems: https://github.com/ribraima/mafos-website/actions
 echo.
 pause

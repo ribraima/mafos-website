@@ -73,7 +73,7 @@ Add a block to `"categories"` with a `slug`, a `label` and a `description`. A ca
 
 ## Publishing (automatic, free)
 
-The site is hosted on GitHub Pages. Every change that reaches the `main` branch on GitHub goes live by itself in about a minute:
+The site is live at **https://mafos.pages.dev** (Cloudflare Pages), with a backup copy at https://ribraima.github.io/mafos-website/ (GitHub Pages). Both are free. Every change that reaches the `main` branch on GitHub goes live on both by itself in about a minute:
 
 ```
 edit files ──► publish.cmd ──► GitHub ──► check content ──► deploy ──► live site
@@ -85,7 +85,8 @@ edit files ──► publish.cmd ──► GitHub ──► check content ──
 - **From anywhere:** open the repository on github.com, edit `content/content.js` or upload images in the browser, and commit. That publishes too. (Run `publish.cmd` once afterwards on this computer, or before your next local edit, so both copies stay in step. It pulls the web edits down first.)
 - **Safety net:** before every deploy, `scripts/check-content.js` looks for typos in `content.js`, images that don't exist (file names are case-sensitive online) and duplicate slugs. If it finds a problem, the deploy stops, the live site stays as it was, and the reason is shown in the repository's **Actions** tab.
 - **Every version is kept.** Any earlier state of the site can be brought back from the history on GitHub.
-- **Your own domain:** buy one (e.g. mafos.al), add it under the repository's **Settings → Pages → Custom domain**, and set the DNS records GitHub shows you. HTTPS is free.
+- **Your own domain:** buy one (e.g. mafos.al), then in Cloudflare open **Workers & Pages → mafos → Custom domains** and add it. HTTPS is free.
+- **Cloudflare access:** the pipeline uses an API token named "Mafos website deploy" (Cloudflare Pages → Edit only), stored as the encrypted GitHub secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. To revoke it, delete it at dash.cloudflare.com/profile/api-tokens.
 
 The pipeline is `.github/workflows/deploy.yml`. Only the site files (`index.html`, `project.html`, `assets/`, `content/`, `images/`) are published; this README, the scripts and the logo PDF are not.
 

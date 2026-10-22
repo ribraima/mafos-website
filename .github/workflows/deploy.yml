@@ -1,5 +1,8 @@
-# Publishes the website to GitHub Pages on every push to main.
-# The content check runs first; if it fails, the live site stays as it was.
+# Publishes the website on every push to main:
+#   https://mafos.pages.dev (Cloudflare Pages, main address)
+#   https://ribraima.github.io/mafos-website/ (GitHub Pages, backup)
+# The content check runs first; if it fails, nothing is published.
+# Cloudflare needs the CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID repository secrets.
 name: Publish website
 
 on:
@@ -45,3 +48,12 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v5
+
+      - name: Publish to Cloudflare Pages (mafos.pages.dev)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          npx --yes wrangler@4 pages project list | grep -qw mafos \
+            || npx --yes wrangler@4 pages project create mafos --production-branch main
+          npx --yes wrangler@4 pages deploy _site --project-name mafos --branch main --commit-dirty=true
